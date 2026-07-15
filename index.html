@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trememn · Reservas Ping Pong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --navy:#16213E;
+    --navy-deep:#0D1526;
+    --cream:#FAF7F0;
+    --paper:#FFFFFF;
+    --gold:#D4A017;
+    --gold-soft:#F0D48A;
+    --teal:#2A9D8F;
+    --red:#C1443A;
+    --ink:#20263A;
+    --ink-muted:#5B6478;
+    --line:#E3DECF;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Space Grotesk',sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  header.site{
+    background:var(--navy);
+    color:var(--cream);
+    padding:22px 28px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    border-bottom:4px solid var(--gold);
+  }
+  .brand-mark{
+    width:44px;height:44px;border-radius:10px;
+    background:linear-gradient(135deg,var(--gold),var(--gold-soft));
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:700;color:var(--navy-deep);
+    font-size:20px;flex-shrink:0;
+  }
+  header.site .brand-text h1{font-size:1.25rem;letter-spacing:.02em;}
+  header.site .brand-text p{margin:2px 0 0;font-size:.8rem;color:var(--gold-soft);font-family:'JetBrains Mono',monospace;}
+
+  main{
+    flex:1;
+    width:100%;
+    max-width:960px;
+    margin:0 auto;
+    padding:36px 20px 60px;
+  }
+
+  .screen{display:none;}
+  .screen.active{display:block;animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  @media (prefers-reduced-motion: reduce){
+    .screen.active{animation:none;}
+    *{transition:none !important;animation-duration:.001s !important;}
+  }
+
+  /* ---------- Registro ---------- */
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+    box-shadow:0 1px 3px rgba(20,20,30,.05);
+  }
+  .card h2{font-size:1.6rem;margin-bottom:6px;}
+  .card .lead{color:var(--ink-muted);margin:0 0 24px;font-size:.95rem;}
+
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;font-size:.78rem;font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--ink-muted);margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:8px;
+    font-family:'Space Grotesk',sans-serif;font-size:1rem;background:var(--cream);color:var(--ink);
+  }
+  .field input:focus, .field select:focus{
+    outline:3px solid var(--gold-soft);outline-offset:1px;border-color:var(--gold);
+  }
+  .field .hint{font-size:.78rem;color:var(--ink-muted);margin-top:5px;}
+  .field .error{font-size:.8rem;color:var(--red);margin-top:6px;display:none;font-weight:600;}
+  .field.invalid input, .field.invalid select{border-color:var(--red);}
+  .field.invalid .error{display:block;}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:560px){.row2{grid-template-columns:1fr;}}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:13px 22px;border-radius:8px;border:none;cursor:pointer;
+    font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--navy);color:var(--cream);}
+  .btn-primary:hover{box-shadow:0 4px 14px rgba(22,33,62,.28);}
+  .btn-primary:disabled{background:#B9BDC9;cursor:not-allowed;box-shadow:none;}
+  .btn-gold{background:var(--gold);color:var(--navy-deep);}
+  .btn-gold:hover{box-shadow:0 4px 14px rgba(212,160,23,.35);}
+  .btn-ghost{background:transparent;color:var(--navy);border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--navy);}
+  .btn-small{padding:8px 14px;font-size:.82rem;}
+
+  /* ---------- Calendario ---------- */
+  .top-bar{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    flex-wrap:wrap;gap:14px;margin-bottom:26px;
+  }
+  .top-bar h2{font-size:1.5rem;}
+  .top-bar .who{font-size:.85rem;color:var(--ink-muted);margin-top:4px;}
+  .top-bar .who strong{color:var(--ink);}
+
+  .note-banner{
+    background:#FFF7E0;border:1px solid var(--gold-soft);border-radius:10px;
+    padding:12px 16px;font-size:.85rem;color:#7A5C00;margin-bottom:22px;
+  }
+
+  .day-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+    gap:16px;margin-bottom:30px;
+  }
+  .day-card{
+    background:var(--navy);border-radius:var(--radius);padding:18px;
+    color:var(--cream);border:1px solid var(--navy-deep);
+  }
+  .day-card .date-label{font-family:'Fraunces',serif;font-size:1.05rem;margin-bottom:2px;text-transform:capitalize;}
+  .day-card .date-sub{font-size:.72rem;color:var(--gold-soft);font-family:'JetBrains Mono',monospace;margin-bottom:14px;letter-spacing:.03em;}
+
+  .slot{
+    width:100%;display:flex;justify-content:space-between;align-items:center;
+    background:var(--navy-deep);border:1.5px solid #2A3B63;border-radius:8px;
+    padding:10px 12px;margin-bottom:8px;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;color:var(--gold-soft);font-size:.88rem;
+    transition:background .15s ease, border-color .15s ease, transform .1s ease;
+  }
+  .slot:last-child{margin-bottom:0;}
+  .slot:hover:not(.taken):not(.disabled){border-color:var(--gold);transform:translateX(2px);}
+  .slot:focus-visible{outline:3px solid var(--gold-soft);outline-offset:2px;}
+  .slot .time{font-weight:700;}
+  .slot .dur{font-size:.7rem;color:#8CA0C9;}
+  .slot.selected{background:var(--gold);border-color:var(--gold);color:var(--navy-deep);}
+  .slot.selected .dur{color:#5C4300;}
+  .slot.taken{background:#1B2340;border-color:#2A3B63;color:#57628A;cursor:not-allowed;}
+  .slot.taken .time{text-decoration:line-through;}
+  .slot.mine{background:var(--teal);border-color:var(--teal);color:#08221F;cursor:default;}
+  .slot.mine .dur{color:#0F3A34;}
+  .slot.disabled{opacity:.45;cursor:not-allowed;}
+
+  .weekend-note{font-size:.72rem;color:var(--ink-muted);margin:-14px 0 24px;font-style:italic;}
+
+  .confirm-bar{
+    position:sticky;bottom:16px;background:var(--paper);border:1px solid var(--line);
+    border-radius:var(--radius);padding:16px 20px;display:flex;justify-content:space-between;
+    align-items:center;flex-wrap:wrap;gap:12px;box-shadow:0 6px 24px rgba(20,20,30,.1);
+  }
+  .confirm-bar .summary{font-size:.9rem;color:var(--ink-muted);}
+  .confirm-bar .summary strong{color:var(--ink);}
+
+  .mine-list{margin-top:34px;}
+  .mine-list h3{font-size:1.05rem;margin-bottom:12px;}
+  .mine-item{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    background:var(--paper);border:1px solid var(--line);border-radius:10px;
+    padding:12px 16px;margin-bottom:8px;flex-wrap:wrap;
+  }
+  .mine-item .info{font-size:.86rem;}
+  .mine-item .info .d{font-weight:600;text-transform:capitalize;}
+  .mine-item .info .h{color:var(--ink-muted);font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+
+  /* ---------- Certificado ---------- */
+  .cert-wrap{display:flex;flex-direction:column;align-items:center;}
+  .certificate{
+    background:var(--paper);border:2px solid var(--navy);border-radius:var(--radius);
+    padding:36px;max-width:560px;width:100%;position:relative;overflow:hidden;
+  }
+  .certificate::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:6px;background:var(--gold);
+  }
+  .certificate .eyebrow{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;}
+  .certificate h2{font-size:1.5rem;margin:6px 0 20px;}
+  .cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 20px;margin-bottom:20px;}
+  .cert-field .k{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin-bottom:3px;}
+  .cert-field .v{font-size:.95rem;font-weight:600;}
+  .cert-code{
+    background:var(--navy);color:var(--gold-soft);border-radius:8px;padding:12px 16px;
+    font-family:'JetBrains Mono',monospace;font-size:.85rem;text-align:center;letter-spacing:.05em;margin-top:6px;
+  }
+  .cert-footnote{font-size:.72rem;color:var(--ink-muted);margin-top:18px;line-height:1.5;}
+  .cert-actions{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;justify-content:center;}
+
+  footer.site{
+    text-align:center;padding:20px;font-size:.75rem;color:var(--ink-muted);
+    border-top:1px solid var(--line);
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="brand-mark">CT</div>
+  <div class="brand-text">
+    <h1>Trememn</h1>
+    <p>Reservas ping pong</p>
+  </div>
+</header>
+
+<main>
+
+  <!-- PANTALLA 1: REGISTRO -->
+  <section id="screen-registro" class="screen active">
+    <div class="card">
+      <h2>Regístrate para agendar tu hora</h2>
+      <p class="lead">Completa todos los campos con tu correo institucional para acceder al calendario de horas disponibles.</p>
+
+      <form id="form-registro" novalidate>
+        <div class="row2">
+          <div class="field" id="f-nombre">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" autocomplete="given-name" required>
+            <div class="error">Ingresa tu nombre.</div>
+          </div>
+          <div class="field" id="f-apellido">
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" autocomplete="family-name" required>
+            <div class="error">Ingresa tu apellido.</div>
+          </div>
+        </div>
+
+        <div class="field" id="f-curso">
+          <label for="curso">Curso</label>
+          <select id="curso" required>
+            <option value="" disabled selected>Selecciona tu curso</option>
+            <optgroup label="Enseñanza Básica">
+              <option>7° Básico A</option>
+              <option>7° Básico B</option>
+              <option>8° Básico A</option>
+              <option>8° Básico B</option>
+            </optgroup>
+            <optgroup label="Enseñanza Media">
+              <option>1° Medio A</option>
+              <option>1° Medio B</option>
+              <option>2° Medio A</option>
+              <option>2° Medio B</option>
+              <option>3° Medio A</option>
+              <option>3° Medio B</option>
+              <option>4° Medio A</option>
+              <option>4° Medio B</option>
+            </optgroup>
+          </select>
+          <div class="error">Selecciona tu curso.</div>
+        </div>
+
+        <div class="field" id="f-correo">
+          <label for="correo">Correo institucional</label>
+          <input type="email" id="correo" placeholder="nombre.apellido@trememn.cl" autocomplete="email" required>
+          <div class="hint">Debe terminar en <strong>@trememn.cl</strong></div>
+          <div class="error">Ingresa un correo institucional válido (@trememn.cl).</div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">Acceder al calendario</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- PANTALLA 2: CALENDARIO -->
+  <section id="screen-calendario" class="screen">
+    <div class="top-bar">
+      <div>
+        <h2>Elige tu hora</h2>
+        <p class="who">Sesión de <strong id="who-nombre"></strong> · <span id="who-curso"></span></p>
+      </div>
+      <button class="btn btn-ghost btn-small" id="btn-logout">Cerrar sesión</button>
+    </div>
+
+    <div class="note-banner">
+      Se muestran los próximos 7 días hábiles (lunes a viernes). Puedes reservar <strong>una hora por día</strong>, con un máximo de <strong>2 reservas cada 7 días</strong>.
+    </div>
+
+    <div class="note-banner" id="limit-banner" style="display:none;background:#FBE9E7;border-color:#E3B0AB;color:#8A2E24;">
+      Has alcanzado el límite de 2 reservas dentro de los próximos 7 días hábiles. Vuelve más adelante para reservar otra hora.
+    </div>
+
+    <div id="day-grid" class="day-grid"></div>
+
+    <div class="confirm-bar">
+      <div class="summary" id="confirm-summary">No has seleccionado ninguna hora todavía.</div>
+      <button class="btn btn-gold" id="btn-confirmar" disabled>Confirmar hora</button>
+    </div>
+
+    <div class="mine-list" id="mine-list-wrap" style="display:none;">
+      <h3>Tus horas reservadas</h3>
+      <div id="mine-list"></div>
+    </div>
+  </section>
+
+  <!-- PANTALLA 3: CERTIFICADO -->
+  <section id="screen-certificado" class="screen">
+    <div class="cert-wrap">
+      <div class="certificate" id="certificate">
+        <span class="eyebrow">Certificado de reserva de hora</span>
+        <h2>Trememn</h2>
+        <div class="cert-grid">
+          <div class="cert-field"><div class="k">Estudiante</div><div class="v" id="c-nombre"></div></div>
+          <div class="cert-field"><div class="k">Curso</div><div class="v" id="c-curso"></div></div>
+          <div class="cert-field"><div class="k">Correo institucional</div><div class="v" id="c-correo"></div></div>
+          <div class="cert-field"><div class="k">Emitido el</div><div class="v" id="c-emision"></div></div>
+          <div class="cert-field" style="grid-column:1/-1;"><div class="k">Hora reservada (uso)</div><div class="v" id="c-uso"></div></div>
+        </div>
+        <div class="cert-code" id="c-codigo"></div>
+        <p class="cert-footnote">Este certificado acredita que el horario indicado corresponde exclusivamente al estudiante y correo señalados arriba. Documento generado localmente en este navegador.</p>
+      </div>
+      <div class="cert-actions">
+        <button class="btn btn-gold" id="btn-pdf">Descargar certificado (PDF)</button>
+        <button class="btn btn-ghost" id="btn-volver">Volver al calendario</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  Trememn · Sistema de agendamiento local (datos guardados solo en este navegador)
+  · <a href="#" id="btn-reset" style="color:inherit;">Borrar todos los datos de prueba</a>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  const DOMINIO = "@trememn.cl";
+  const SLOTS = [
+    {hora:"09:30", fin:"09:45", dur:"15 min"},
+    {hora:"11:15", fin:"11:30", dur:"15 min"},
+    {hora:"13:00", fin:"13:15", dur:"15 min"},
+    {hora:"14:50", fin:"15:30", dur:"40 min"}
+  ];
+  const LS_USER = "tremen_current_user";
+  const LS_RES  = "tremen_reservas";
+
+  // Respaldo en memoria por si localStorage no está disponible (ej. vista previa en iframe sandbox)
+  const memoryStore = {};
+  let storageDisponible = true;
+  try{
+    const testKey = "__tremen_test__";
+    localStorage.setItem(testKey, "1");
+    localStorage.removeItem(testKey);
+  }catch(e){
+    storageDisponible = false;
+  }
+
+  const storage = {
+    get(key){
+      if(storageDisponible){
+        try{ return localStorage.getItem(key); }catch(e){ return memoryStore[key] ?? null; }
+      }
+      return memoryStore[key] ?? null;
+    },
+    set(key, value){
+      if(storageDisponible){
+        try{ localStorage.setItem(key, value); return; }catch(e){ /* cae a memoria */ }
+      }
+      memoryStore[key] = value;
+    },
+    remove(key){
+      if(storageDisponible){
+        try{ localStorage.removeItem(key); return; }catch(e){ /* cae a memoria */ }
+      }
+      delete memoryStore[key];
+    }
+  };
+
+  if(!storageDisponible){
+    const warn = document.createElement("div");
+    warn.style.cssText = "background:#FFF3CD;color:#7A5C00;padding:10px 16px;font-size:.82rem;text-align:center;border-bottom:1px solid #F0D48A;";
+    warn.textContent = "⚠ Este visor no permite guardar datos de forma permanente. Descarga el archivo y ábrelo directamente en tu navegador para que las reservas se guarden entre sesiones.";
+    document.body.insertBefore(warn, document.body.firstChild);
+  }
+
+  const screens = {
+    registro: document.getElementById("screen-registro"),
+    calendario: document.getElementById("screen-calendario"),
+    certificado: document.getElementById("screen-certificado")
+  };
+  function showScreen(name){
+    Object.values(screens).forEach(s=>s.classList.remove("active"));
+    screens[name].classList.add("active");
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+
+  // ---------------- SUPABASE ----------------
+  const SUPABASE_URL = "https://uffbfeeahwscdatjeuhc.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmZmJmZWVhaHdzY2RhdGpldWhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM1MjcwNDksImV4cCI6MjA5OTEwMzA0OX0._NEoDiwBtqB5PGrFzxksMT4eDrmwcVU1gKmbBWvt0mQ";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function fetchReservas(){
+    const { data, error } = await sb.from("reservas").select("*");
+    if(error){
+      console.error(error);
+      alert("No se pudo conectar con la base de datos. Revisa tu conexión e intenta de nuevo.");
+      return [];
+    }
+    return data.map(r => ({
+      codigo: r.codigo,
+      nombre: r.nombre,
+      apellido: r.apellido,
+      curso: r.curso,
+      correo: r.correo,
+      fecha: r.fecha,
+      fechaLarga: fmtFechaLarga(new Date(r.fecha + "T00:00:00")),
+      hora: r.hora.slice(0,5),
+      horaFin: r.hora_fin.slice(0,5),
+      emitido: r.emitido
+    }));
+  }
+
+  async function crearReserva(nueva){
+    const { data, error } = await sb.from("reservas").insert({
+      codigo: nueva.codigo,
+      nombre: nueva.nombre,
+      apellido: nueva.apellido,
+      curso: nueva.curso,
+      correo: nueva.correo,
+      fecha: nueva.fecha,
+      hora: nueva.hora,
+      hora_fin: nueva.horaFin
+    }).select().single();
+
+    if(error){
+      if(error.code === "23505"){
+        return { ok:false, motivo:"ocupado" };
+      }
+      console.error(error);
+      return { ok:false, motivo:"error" };
+    }
+    return { ok:true, reserva: {
+      codigo: data.codigo, nombre: data.nombre, apellido: data.apellido, curso: data.curso,
+      correo: data.correo, fecha: data.fecha, fechaLarga: fmtFechaLarga(new Date(data.fecha+"T00:00:00")),
+      hora: data.hora.slice(0,5), horaFin: data.hora_fin.slice(0,5), emitido: data.emitido
+    }};
+  }
+
+  function getUser(){ try{ return JSON.parse(storage.get(LS_USER)); }catch(e){ return null; } }
+  function setUser(u){ storage.set(LS_USER, JSON.stringify(u)); }
+  function clearUser(){ storage.remove(LS_USER); }
+
+  function generarCodigo(){
+    return "TRM-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2,6).toUpperCase();
+  }
+
+  function fmtFechaLarga(dateObj){
+    return dateObj.toLocaleDateString("es-CL",{weekday:"long", day:"numeric", month:"long", year:"numeric"});
+  }
+  function isoDate(dateObj){
+    return dateObj.toISOString().slice(0,10);
+  }
+
+  // ---------------- REGISTRO ----------------
+  const form = document.getElementById("form-registro");
+  const fields = {
+    nombre: document.getElementById("nombre"),
+    apellido: document.getElementById("apellido"),
+    curso: document.getElementById("curso"),
+    correo: document.getElementById("correo")
+  };
+  const wraps = {
+    nombre: document.getElementById("f-nombre"),
+    apellido: document.getElementById("f-apellido"),
+    curso: document.getElementById("f-curso"),
+    correo: document.getElementById("f-correo")
+  };
+
+  function validarCorreo(v){
+    const re = new RegExp("^[^\\s@]+" + DOMINIO.replace(".", "\\.") + "$", "i");
+    return re.test(v.trim());
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    let valido = true;
+
+    if(!fields.nombre.value.trim()){ wraps.nombre.classList.add("invalid"); valido=false; } else wraps.nombre.classList.remove("invalid");
+    if(!fields.apellido.value.trim()){ wraps.apellido.classList.add("invalid"); valido=false; } else wraps.apellido.classList.remove("invalid");
+    if(!fields.curso.value){ wraps.curso.classList.add("invalid"); valido=false; } else wraps.curso.classList.remove("invalid");
+    if(!validarCorreo(fields.correo.value)){ wraps.correo.classList.add("invalid"); valido=false; } else wraps.correo.classList.remove("invalid");
+
+    if(!valido) return;
+
+    const user = {
+      nombre: fields.nombre.value.trim(),
+      apellido: fields.apellido.value.trim(),
+      curso: fields.curso.value,
+      correo: fields.correo.value.trim().toLowerCase()
+    };
+    setUser(user);
+    entrarCalendario();
+  });
+
+  document.getElementById("btn-logout").addEventListener("click", function(){
+    clearUser();
+    form.reset();
+    Object.values(wraps).forEach(w=>w.classList.remove("invalid"));
+    showScreen("registro");
+  });
+
+  document.getElementById("btn-reset").addEventListener("click", function(e){
+    e.preventDefault();
+    const ok = confirm("Esto borrará tu sesión en este navegador (nombre, curso, correo). Las reservas ya guardadas en la base de datos NO se borran desde aquí — para eso ve al Table Editor en Supabase. ¿Continuar?");
+    if(!ok) return;
+    storage.remove(LS_USER);
+    form.reset();
+    Object.values(wraps).forEach(w=>w.classList.remove("invalid"));
+    showScreen("registro");
+    alert("Sesión local borrada.");
+  });
+
+  // ---------------- CALENDARIO ----------------
+  let selected = null; // {fecha, hora, fin, fechaLarga}
+
+  const DIAS_HABILES_A_MOSTRAR = 7;
+  const LIMITE_RESERVAS_VENTANA = 2;
+
+  function buildDiasHabiles(){
+    const dias = [];
+    const hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    let i = 1;
+    while(dias.length < DIAS_HABILES_A_MOSTRAR){
+      const d = new Date(hoy);
+      d.setDate(hoy.getDate()+i);
+      const dow = d.getDay(); // 0 dom, 6 sab
+      if(dow !== 0 && dow !== 6){
+        dias.push(d);
+      }
+      i++;
+    }
+    return dias;
+  }
+
+  async function renderCalendario(){
+    const user = getUser();
+    if(!user) return;
+    document.getElementById("who-nombre").textContent = user.nombre + " " + user.apellido;
+    document.getElementById("who-curso").textContent = user.curso;
+
+    const grid = document.getElementById("day-grid");
+    grid.innerHTML = '<p class="mono" style="color:var(--ink-muted);">Cargando horarios…</p>';
+    selected = null;
+    updateConfirmBar();
+    document.getElementById("btn-confirmar").disabled = true;
+
+    const reservas = await fetchReservas();
+    const misReservas = reservas.filter(r => r.correo === user.correo);
+    const misFechas = new Set(misReservas.map(r=>r.fecha));
+
+    grid.innerHTML = "";
+
+    const diasHabiles = buildDiasHabiles();
+    const ventanaInicio = isoDate(diasHabiles[0]);
+    const ventanaFin = isoDate(diasHabiles[diasHabiles.length - 1]);
+    const misReservasEnVentana = misReservas.filter(r => r.fecha >= ventanaInicio && r.fecha <= ventanaFin);
+    const limiteAlcanzado = misReservasEnVentana.length >= LIMITE_RESERVAS_VENTANA;
+
+    const limitBanner = document.getElementById("limit-banner");
+    if(limiteAlcanzado){
+      limitBanner.style.display = "block";
+    } else {
+      limitBanner.style.display = "none";
+    }
+
+    diasHabiles.forEach(dia => {
+      const fechaISO = isoDate(dia);
+      const card = document.createElement("div");
+      card.className = "day-card";
+
+      const label = document.createElement("div");
+      label.className = "date-label";
+      label.textContent = fmtFechaLarga(dia);
+      card.appendChild(label);
+
+      const sub = document.createElement("div");
+      sub.className = "date-sub mono";
+      sub.textContent = fechaISO;
+      card.appendChild(sub);
+
+      const yaReservoEsteDia = misFechas.has(fechaISO);
+
+      SLOTS.forEach(s => {
+        const ocupado = reservas.some(r => r.fecha === fechaISO && r.hora === s.hora);
+        const esMio = misReservas.some(r => r.fecha === fechaISO && r.hora === s.hora);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "slot";
+        btn.setAttribute("data-fecha", fechaISO);
+        btn.setAttribute("data-hora", s.hora);
+
+        const bloqueadoPorLimite = limiteAlcanzado && !esMio;
+
+        if(esMio){
+          btn.classList.add("mine");
+        } else if(ocupado){
+          btn.classList.add("taken");
+        } else if(yaReservoEsteDia || bloqueadoPorLimite){
+          btn.classList.add("disabled");
+        }
+
+        btn.innerHTML = '<span class="time">'+s.hora+' – '+s.fin+'</span><span class="dur">'+
+          (esMio ? "TU HORA" : ocupado ? "OCUPADO" : bloqueadoPorLimite ? "LÍMITE ALCANZADO" : yaReservoEsteDia ? "BLOQUEADO" : s.dur) +
+          '</span>';
+
+        if(!ocupado && !esMio && !yaReservoEsteDia && !bloqueadoPorLimite){
+          btn.addEventListener("click", function(){
+            document.querySelectorAll(".slot.selected").forEach(el=>el.classList.remove("selected"));
+            btn.classList.add("selected");
+            selected = {fecha: fechaISO, hora: s.hora, fin: s.fin, fechaLarga: fmtFechaLarga(dia)};
+            updateConfirmBar();
+          });
+        } else {
+          btn.disabled = true;
+        }
+
+        card.appendChild(btn);
+      });
+
+      grid.appendChild(card);
+    });
+
+    renderMisReservas(misReservas);
+  }
+
+  function updateConfirmBar(){
+    const summary = document.getElementById("confirm-summary");
+    const btn = document.getElementById("btn-confirmar");
+    if(selected){
+      summary.innerHTML = 'Hora seleccionada: <strong>'+selected.fechaLarga+' · '+selected.hora+' – '+selected.fin+'</strong>';
+      btn.disabled = false;
+    } else {
+      summary.textContent = "No has seleccionado ninguna hora todavía.";
+      btn.disabled = true;
+    }
+  }
+
+  function renderMisReservas(misReservas){
+    const wrap = document.getElementById("mine-list-wrap");
+    const list = document.getElementById("mine-list");
+    list.innerHTML = "";
+    if(misReservas.length === 0){
+      wrap.style.display = "none";
+      return;
+    }
+    wrap.style.display = "block";
+    misReservas
+      .slice()
+      .sort((a,b)=> (a.fecha+a.hora).localeCompare(b.fecha+b.hora))
+      .forEach(r=>{
+        const item = document.createElement("div");
+        item.className = "mine-item";
+        const dObj = new Date(r.fecha + "T00:00:00");
+        item.innerHTML =
+          '<div class="info"><div class="d">'+fmtFechaLarga(dObj)+'</div>'+
+          '<div class="h">'+r.hora+' – '+r.horaFin+' · código '+r.codigo+'</div></div>';
+        const btn = document.createElement("button");
+        btn.className = "btn btn-ghost btn-small";
+        btn.textContent = "Ver certificado";
+        btn.addEventListener("click", function(){ mostrarCertificado(r); });
+        item.appendChild(btn);
+        list.appendChild(item);
+      });
+  }
+
+  document.getElementById("btn-confirmar").addEventListener("click", async function(){
+    if(!selected) return;
+    const user = getUser();
+    const btnConfirmar = document.getElementById("btn-confirmar");
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = "Confirmando…";
+
+    // Revalidamos el límite semanal justo antes de enviar (usando datos frescos)
+    const reservas = await fetchReservas();
+    const misReservas = reservas.filter(r => r.correo === user.correo);
+
+    const yaReservoEseDia = misReservas.some(r => r.fecha === selected.fecha);
+    if(yaReservoEseDia){
+      alert("Ya tienes una hora reservada ese día. Solo se permite una hora por día.");
+      btnConfirmar.textContent = "Confirmar hora";
+      renderCalendario();
+      return;
+    }
+
+    const diasHabilesActuales = buildDiasHabiles();
+    const ventanaInicioActual = isoDate(diasHabilesActuales[0]);
+    const ventanaFinActual = isoDate(diasHabilesActuales[diasHabilesActuales.length - 1]);
+    const reservasEnVentanaActual = misReservas.filter(r => r.fecha >= ventanaInicioActual && r.fecha <= ventanaFinActual);
+    if(reservasEnVentanaActual.length >= LIMITE_RESERVAS_VENTANA){
+      alert("Has alcanzado el límite de " + LIMITE_RESERVAS_VENTANA + " reservas dentro de los próximos 7 días hábiles.");
+      btnConfirmar.textContent = "Confirmar hora";
+      renderCalendario();
+      return;
+    }
+
+    const slotDef = SLOTS.find(s=>s.hora === selected.hora);
+    const intento = {
+      codigo: generarCodigo(),
+      nombre: user.nombre,
+      apellido: user.apellido,
+      curso: user.curso,
+      correo: user.correo,
+      fecha: selected.fecha,
+      hora: selected.hora,
+      horaFin: slotDef.fin
+    };
+
+    const resultado = await crearReserva(intento);
+    btnConfirmar.textContent = "Confirmar hora";
+
+    if(!resultado.ok){
+      if(resultado.motivo === "ocupado"){
+        alert("Lo sentimos, esa hora acaba de ser reservada por otra persona. Elige otra.");
+      } else {
+        alert("Ocurrió un error al guardar tu reserva. Intenta de nuevo.");
+      }
+      renderCalendario();
+      return;
+    }
+
+    mostrarCertificado(resultado.reserva);
+  });
+
+  // ---------------- CERTIFICADO ----------------
+  function fmtEmision(iso){
+    const d = new Date(iso);
+    return d.toLocaleDateString("es-CL",{day:"2-digit",month:"2-digit",year:"numeric"}) + " · " +
+           d.toLocaleTimeString("es-CL",{hour:"2-digit",minute:"2-digit"});
+  }
+
+  let reservaActual = null;
+
+  function mostrarCertificado(r){
+    reservaActual = r;
+    document.getElementById("c-nombre").textContent = r.nombre + " " + r.apellido;
+    document.getElementById("c-curso").textContent = r.curso;
+    document.getElementById("c-correo").textContent = r.correo;
+    document.getElementById("c-emision").textContent = fmtEmision(r.emitido);
+    document.getElementById("c-uso").textContent = r.fechaLarga + " · " + r.hora + " – " + r.horaFin + " hrs";
+    document.getElementById("c-codigo").textContent = "Código de verificación: " + r.codigo;
+    showScreen("certificado");
+  }
+
+  document.getElementById("btn-volver").addEventListener("click", async function(){
+    await renderCalendario();
+    showScreen("calendario");
+  });
+
+  document.getElementById("btn-pdf").addEventListener("click", function(){
+    if(!reservaActual) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const navy = [22,33,62];
+    const gold = [212,160,23];
+
+    doc.setFillColor(navy[0],navy[1],navy[2]);
+    doc.rect(0,0,210,26,"F");
+    doc.setFillColor(gold[0],gold[1],gold[2]);
+    doc.rect(0,26,210,3,"F");
+
+    doc.setTextColor(250,247,240);
+    doc.setFont("helvetica","bold");
+    doc.setFontSize(18);
+    doc.text("Trememn", 15, 16);
+    doc.setFontSize(10);
+    doc.setFont("helvetica","normal");
+    doc.text("Certificado de Reserva de Hora — Reservas Ping Pong", 15, 22);
+
+    doc.setTextColor(30,30,40);
+    let y = 45;
+    const campo = (label, valor) => {
+      doc.setFont("helvetica","bold");
+      doc.setFontSize(10);
+      doc.text(label.toUpperCase(), 15, y);
+      doc.setFont("helvetica","normal");
+      doc.setFontSize(12);
+      doc.text(String(valor), 15, y+6);
+      y += 16;
+    };
+
+    campo("Estudiante", reservaActual.nombre + " " + reservaActual.apellido);
+    campo("Curso", reservaActual.curso);
+    campo("Correo institucional", reservaActual.correo);
+    campo("Hora reservada (uso)", reservaActual.fechaLarga + "  ·  " + reservaActual.hora + " - " + reservaActual.horaFin + " hrs");
+    campo("Emitido el", fmtEmision(reservaActual.emitido));
+
+    doc.setFillColor(navy[0],navy[1],navy[2]);
+    doc.roundedRect(15, y, 180, 14, 2, 2, "F");
+    doc.setTextColor(gold[0],gold[1],gold[2]);
+    doc.setFont("courier","bold");
+    doc.setFontSize(11);
+    doc.text("CODIGO DE VERIFICACION: " + reservaActual.codigo, 20, y+9);
+
+    y += 26;
+    doc.setTextColor(90,95,110);
+    doc.setFont("helvetica","normal");
+    doc.setFontSize(9);
+    doc.text("Este certificado acredita que el horario indicado corresponde exclusivamente al estudiante", 15, y);
+    doc.text("y correo institucional señalados arriba. Documento generado localmente en el navegador.", 15, y+5);
+
+    doc.save("certificado_" + reservaActual.codigo + ".pdf");
+  });
+
+  // ---------------- ENTRADA ----------------
+  async function entrarCalendario(){
+    showScreen("calendario");
+    await renderCalendario();
+  }
+
+  const existente = getUser();
+  if(existente){
+    entrarCalendario();
+  }
+
+})();
+</script>
+</body>
+</html>
