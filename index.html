@@ -1191,6 +1191,12 @@ function abrirLeccion(l){
       const items = b.pasos.map(p=>`<li>${p}</li>`).join("");
       div.innerHTML = `<span class="mb-label">Método</span><h4>${b.h}</h4><ol>${items}</ol>`;
       body.appendChild(div);
+      if(b.t === "diagrama"){
+      const div = document.createElement("div");
+      div.className = "diagrama-block";
+      div.innerHTML = b.svg + (b.caption ? `<div class="dg-caption">${b.caption}</div>` : "");
+      body.appendChild(div);
+    } else
     } else if(b.t === "ejemplo"){
       const div = document.createElement("div");
       div.className = "ejemplo-block";
