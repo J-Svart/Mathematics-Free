@@ -94,44 +94,65 @@ const LECCIONES_NUMEROS = [
   {
     id:"na2", titulo:"Raíces cuadradas y cúbicas",
     bloques:[
-      {t:"concepto", h:"Concepto", p:"La raíz cuadrada de un número a (√a) es el valor que multiplicado por sí mismo da a. La raíz cúbica (∛a) es el valor que multiplicado tres veces da a. La raíz cuadrada de un número negativo no existe en los números reales, pero la raíz cúbica de un número negativo sí existe y es negativa."},
-      {t:"metodo", h:"Método para calcular raíces", pasos:[
-        "Para √a, busca qué número multiplicado por sí mismo da a.",
-        "Para ∛a, busca qué número multiplicado tres veces da a.",
-        "Si a es negativo, recuerda: la raíz cuadrada NO existe en los reales, pero la raíz cúbica SÍ existe (y es negativa).",
-        "Si el número no es un cuadrado o cubo perfecto, la raíz es inexacta y se puede aproximar con decimales."
+      {t:"concepto", h:"¿Qué es una raíz? La operación inversa de la potencia", p:"Cuando calculamos 5²=25, hacemos una potencia. La raíz hace exactamente lo contrario: dado el resultado (25), nos preguntamos ¿qué número había que elevar al cuadrado para obtenerlo? La respuesta es 5, por eso √25=5. Lo mismo ocurre con la raíz cúbica: como 3³=27, entonces ∛27=3. En resumen: la raíz cuadrada √a busca el número que multiplicado POR SÍ MISMO dos veces da a; la raíz cúbica ∛a busca el número que multiplicado POR SÍ MISMO tres veces da a."},
+      {t:"concepto", h:"Cuadrados y cubos perfectos: la tabla que debes conocer de memoria", p:"Un número es un cuadrado perfecto cuando su raíz cuadrada es exacta (sin decimales). Los primeros cuadrados perfectos son: 1 (√1=1), 4 (√4=2), 9 (√9=3), 16 (√16=4), 25 (√25=5), 36 (√36=6), 49 (√49=7), 64 (√64=8), 81 (√81=9), 100 (√100=10), 121 (√121=11), 144 (√144=12). Los primeros cubos perfectos son: 1 (∛1=1), 8 (∛8=2), 27 (∛27=3), 64 (∛64=4), 125 (∛125=5), 216 (∛216=6). Si el número no aparece en estas listas, la raíz NO es exacta y debemos aproximar o simplificar."},
+      {t:"concepto", h:"Raíces de números negativos: ¿cuándo existen y cuándo no?", p:"La raíz cuadrada de un número negativo NO existe en los números reales. ¿Por qué? Porque cualquier número real al cuadrado es siempre positivo o cero: tanto (+3)²=9 como (−3)²=9. Nunca obtendrás un resultado negativo al elevar al cuadrado. Por lo tanto √(−9) no tiene solución real. En cambio, la raíz cúbica de un negativo SÍ existe: (−3)³=(−3)×(−3)×(−3)=−27, por lo tanto ∛(−27)=−3. La diferencia clave: el exponente par (cuadrado) siempre da positivo; el exponente impar (cubo) conserva el signo negativo."},
+      {t:"concepto", h:"Propiedad fundamental: √(a×b) = √a × √b", p:"Esta propiedad es la clave para simplificar raíces. Significa que la raíz de un producto se puede separar en el producto de las raíces. Por ejemplo: √(9×4) = √9 × √4 = 3 × 2 = 6. Esto es equivalente a calcular directamente √36=6. La propiedad también funciona al revés: podemos JUNTAR raíces que estén multiplicadas. Ejemplos: √(25×16) = √25 × √16 = 5 × 4 = 20; ∛(8×27) = ∛8 × ∛27 = 2 × 3 = 6. IMPORTANTE: Esta propiedad NO funciona con sumas ni restas: √(9+16) ≠ √9 + √16 (el lado izquierdo da √25=5, el derecho da 3+4=7, son distintos)."},
+      {t:"concepto", h:"Simplificar raíces: cómo sacar factores fuera del signo √", p:"Muchas veces la raíz no es exacta, pero se puede simplificar sacando factores cuadrados perfectos. El método es: 1) Descompón el número en factores, buscando el mayor cuadrado perfecto que lo divida. 2) Separa la raíz usando la propiedad √(a×b)=√a×√b. 3) Calcula la raíz del factor perfecto y déjala afuera; la otra parte queda dentro del signo √. Ejemplo: √50. Buscamos el mayor cuadrado perfecto que divida a 50: es 25 (porque 50=25×2). Entonces: √50 = √(25×2) = √25 × √2 = 5√2. Otro ejemplo: √72 = √(36×2) = √36 × √2 = 6√2. ¿Por qué 36 y no 4? Porque 36 es el MAYOR cuadrado perfecto que divide a 72, y mientras más grande sea, más simplificamos."},
+      {t:"metodo", h:"Método para simplificar una raíz cuadrada paso a paso", pasos:[
+        "Pregúntate: ¿el número bajo la raíz es un cuadrado perfecto? Si sí → calcula directamente. Si no → sigue al paso 2.",
+        "Busca el mayor cuadrado perfecto que divida al número. (Pista: prueba con 4, 9, 16, 25, 36, 49, 64, 81, 100...).",
+        "Escribe el número como producto: número = (cuadrado perfecto) × (lo que sobra).",
+        "Aplica la propiedad: √(perfecto × resto) = √perfecto × √resto.",
+        "Calcula la raíz del cuadrado perfecto (da un número entero) y déjala fuera. El resto queda dentro del signo √.",
+        "Verifica que lo que quedó dentro no tenga más factores cuadrados perfectos."
       ]},
-      {t:"ejemplo", h:"Ejemplo 1 — Calcular √64", pasos:[
-        "Busco qué número multiplicado por sí mismo da 64",
-        "8×8=64",
-        "√64=8"
+      {t:"ejemplo", h:"Ejemplo 1 — Calcular √144 (cuadrado perfecto directo)", pasos:[
+        "¿144 es cuadrado perfecto? Sí: 12×12=144.",
+        "Por lo tanto √144 = 12.",
+        "Verificación: 12²=144 ✓"
       ]},
-      {t:"ejemplo", h:"Ejemplo 2 — Calcular ∛−27", pasos:[
-        "Busco qué número multiplicado tres veces da −27",
-        "(−3)×(−3)×(−3) = −27",
-        "∛−27=−3"
+      {t:"ejemplo", h:"Ejemplo 2 — Simplificar √72 (no es cuadrado perfecto)", pasos:[
+        "72 no es cuadrado perfecto (8²=64, 9²=81).",
+        "Busco el mayor cuadrado perfecto que divida a 72: pruebo 4→72÷4=18 ✓, pruebo 9→72÷9=8 ✓, pruebo 36→72÷36=2 ✓. El mayor es 36.",
+        "Escribo: 72 = 36×2.",
+        "Aplico la propiedad: √72 = √(36×2) = √36 × √2 = 6√2.",
+        "Verificación: (6√2)² = 36×2 = 72 ✓"
       ]},
-      {t:"ejemplo", h:"Ejemplo 3 — Raíz inexacta", pasos:[
-        "√50: 50 no es un cuadrado perfecto (7²=49, 8²=64)",
-        "El valor está entre 7 y 8",
-        "√50 ≈ 7,07 (aproximado)"
+      {t:"ejemplo", h:"Ejemplo 3 — Simplificar √(9×4) usando la propiedad", pasos:[
+        "Aplico directamente la propiedad √(a×b) = √a × √b.",
+        "√(9×4) = √9 × √4 = 3 × 2 = 6.",
+        "ERROR COMÚN a evitar: NO es √9 + √4 = 3+2 = 5. La propiedad es para PRODUCTOS, no para sumas.",
+        "Verificación: √(9×4) = √36 = 6 ✓"
+      ]},
+      {t:"ejemplo", h:"Ejemplo 4 — Calcular ∛(−8×27)", pasos:[
+        "Aplico la propiedad de la raíz al producto: ∛(−8×27) = ∛(−8) × ∛27.",
+        "∛(−8) = −2 (porque (−2)³=−8) y ∛27 = 3 (porque 3³=27).",
+        "Resultado: −2 × 3 = −6.",
+        "Verificación: (−6)³ = −216, y −8×27=−216 ✓"
+      ]},
+      {t:"ejemplo", h:"Ejemplo 5 — ERROR TÍPICO: √(a+b) ≠ √a + √b", pasos:[
+        "Calcula √(9+16) de las DOS formas para ver cuál es correcta.",
+        "Forma correcta: √(9+16) = √25 = 5. Primero se suma dentro, LUEGO se saca la raíz.",
+        "Forma INCORRECTA: √9 + √16 = 3 + 4 = 7. Este resultado es DISTINTO.",
+        "Conclusión: la propiedad √(a×b)=√a×√b SOLO funciona con multiplicación. Con suma o resta, SIEMPRE debes calcular primero lo que está dentro del signo raíz."
       ]}
     ],
     estandar:[
-      {p:"Calcula √36", o:["6","18","9","4"], r:0, e:"6×6=36."},
-      {p:"Calcula √100", o:["10","50","20","5"], r:0, e:"10×10=100."},
-      {p:"Calcula ∛8", o:["2","4","8","3"], r:0, e:"2×2×2=8."},
-      {p:"Calcula ∛125", o:["5","25","15","3"], r:0, e:"5×5×5=125."},
-      {p:"¿Cuál es el valor de √−16?", o:["No existe en los números reales","4","−4","16"], r:0, e:"No existe ningún número real que al multiplicarse por sí mismo dé un resultado negativo."},
-      {p:"Calcula ∛−1", o:["−1","1","0","−3"], r:0, e:"(−1)×(−1)×(−1)=−1."},
-      {p:"¿Es √81 un número exacto?", o:["Sí, es 9","No, es aproximado","Sí, es 40,5","No existe"], r:0, e:"9×9=81, por lo tanto √81=9 exactamente."},
-      {p:"¿Cuál de estas raíces es exacta?", o:["√81","√50","√20","√90"], r:0, e:"81 es un cuadrado perfecto (9²), las otras no lo son."}
+      {p:"Calcula √81", o:["9","8","41","18"], r:0, e:"9×9=81, por lo tanto √81=9. Es el cuadrado perfecto del 9."},
+      {p:"Calcula ∛125", o:["5","25","15","3"], r:0, e:"5×5×5=125, por lo tanto ∛125=5."},
+      {p:"¿Cuál es el valor de √(−25)?", o:["No existe en los números reales","5","−5","−25"], r:0, e:"No existe ningún número real que al cuadrado dé negativo: tanto (+5)²=25 como (−5)²=25 son positivos. √(−25) no tiene solución real."},
+      {p:"¿Cuánto es ∛(−27)?", o:["−3","3","−9","No existe"], r:0, e:"(−3)×(−3)×(−3)=−27, por lo tanto ∛(−27)=−3. La raíz cúbica de negativos SÍ existe."},
+      {p:"Calcula √(9×4) usando la propiedad √(a×b)=√a×√b", o:["6","13","36","7"], r:0, e:"√(9×4)=√9×√4=3×2=6. NO es √9+√4=3+4=7; la propiedad es para multiplicación, no suma."},
+      {p:"¿Cuál de estas simplificaciones es INCORRECTA?", o:["√(4+9) = √4 + √9","√(4×9) = √4 × √9","√36 = 6","∛27 = 3"], r:0, e:"La propiedad de separar raíces solo vale para productos: √(a×b)=√a×√b. Con suma es FALSO: √(4+9)=√13≈3,6, no √4+√9=2+3=5."},
+      {p:"Simplifica √50 (elige la forma simplificada correcta)", o:["5√2","10√5","25√2","5√10"], r:0, e:"50=25×2, y 25 es el mayor cuadrado perfecto que divide a 50. √50=√(25×2)=√25×√2=5√2."},
+      {p:"¿Cuál es el mayor cuadrado perfecto que divide a 72?", o:["36","4","9","16"], r:0, e:"72÷36=2 (exacto), y 36=6² es cuadrado perfecto. Es el mayor porque 72÷49 no es exacto. Por eso √72=6√2."}
     ],
     avanzado:[
-      {p:"Calcula √(4×9)", o:["6","13","36","18"], r:0, e:"√4×√9=2×3=6 (equivale a √36=6)."},
-      {p:"Calcula ∛(−8×27)", o:["−6","6","−19","19"], r:0, e:"−8×27=−216, y ∛−216=−6."},
-      {p:"Si √x=12, ¿cuál es el valor de x?", o:["144","24","6","72"], r:0, e:"x=12²=144."},
-      {p:"Calcula √144 − ∛27", o:["9","15","12","6"], r:0, e:"√144=12, ∛27=3, 12−3=9."}
+      {p:"Simplifica √98", o:["7√2","14√7","49√2","9√2"], r:0, e:"98=49×2, y 49=7² es el mayor cuadrado perfecto que divide a 98. √98=√(49×2)=7√2."},
+      {p:"Calcula √(16×25) sin multiplicar primero", o:["20","41","80","10"], r:0, e:"√(16×25)=√16×√25=4×5=20. Es equivalente a √400=20."},
+      {p:"Si √x = 13, ¿cuánto vale x?", o:["169","26","6,5","130"], r:0, e:"Si √x=13, entonces x=13²=169. Verificación: √169=13 ✓"},
+      {p:"Calcula √(144÷4)", o:["6","3","12","9"], r:0, e:"La propiedad también funciona para divisiones: √(144÷4)=√144÷√4=12÷2=6. O bien: 144÷4=36 y √36=6."}
     ]
   },
   {
