@@ -1,3 +1,4 @@
+
 (function(){
 "use strict";
 
@@ -7,12 +8,14 @@
    error en UN archivo de contenido (ej. geometria.js) tumbe todo el sitio:
    si ese archivo falla al cargar, ese eje simplemente queda vacío,
    pero el resto del sitio sigue funcionando. */
-const EJE_FUNCIONES = "funciones";
-const EJE_NUMEROS = "numeros-algebra";
+const EJE_FUNCIONES  = "funciones";
+const EJE_NUMEROS    = "numeros-algebra";
+const EJE_GEOMETRIA  = "geometria";
 
 const EJES = [
-  { id: EJE_FUNCIONES, nombre: "Funciones", lecciones: (typeof LECCIONES_FUNCIONES !== "undefined" ? LECCIONES_FUNCIONES : []) },
-  { id: EJE_NUMEROS, nombre: "Números y Álgebra", lecciones: (typeof LECCIONES_NUMEROS !== "undefined" ? LECCIONES_NUMEROS : []) }
+  { id: EJE_FUNCIONES,  nombre: "Funciones",        lecciones: (typeof LECCIONES_FUNCIONES  !== "undefined" ? LECCIONES_FUNCIONES  : []) },
+  { id: EJE_NUMEROS,    nombre: "Números y Álgebra", lecciones: (typeof LECCIONES_NUMEROS    !== "undefined" ? LECCIONES_NUMEROS    : []) },
+  { id: EJE_GEOMETRIA,  nombre: "Geometría",         lecciones: (typeof LECCIONES_GEOMETRIA  !== "undefined" ? LECCIONES_GEOMETRIA  : []) }
 ];
 
 function ejeDeLeccion(leccionId){
